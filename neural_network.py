@@ -1,32 +1,37 @@
 import initial_model_values
+from tqdm import tqdm
 
 def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
-    '''
-    Main training function that run all the necessary calculations
-    :param train_src:
-    :param input_size:
-    :param hidden_layers:
-    :param output_layer:
-    :param epochs:
-    :return:
-    '''
+	'''
+	Main training function that run all the necessary calculations
+	:param train_src:
+	:param input_size:
+	:param hidden_layers:
+	:param output_layer:
+	:param epochs:
+	:return:
+	'''
 	images, labels = load_data(train_src) # Read train data from csv to arrays
-    weights = xavier/ha_init_weights(layers)
-    biases = xavier/ha_init_biases(layers)
-    For epoch in tqdm(epochs):
-		For img in images:
-			# Run the network to get predicted value
-			Predicted = feed_forward(img, weights, biases)
-			# Calculate a scalar of diff between prediction and real val
-			cost = loss_function(predicted, labels[images.indexof(img)])
-			# Run the network backwards to calculate gradients
+	weights = initial_model_values.xavier_weights_init(input_size, hidden_layers, output_layer)
+	biases = initial_model_values.xavier_bias_init(input_size, hidden_layers, output_layer)
+	for epoch in tqdm(epochs):
+		for img in images:
+			'''Run the network to get predicted value'''
+			model_prediction = feed_forward(img, weights, biases)
+
+			'''Calculate a scalar of diff between prediction and real val'''
+			cost = loss_function(model_prediction, labels[images.indexof(img)])
+
+			'''Run the network backwards to calculate gradients'''
 			gradients = compute_gradients(cost, neurons, weights, biases)
-            # Optimize the weights and biases with the gradients
+
+            '''Optimize the weights and biases with the gradients'''
 			Weights, biases = optimize(img, weights, biases, layers)
 		Print(loss)
     Export_model(weights, biases)
     Return weights, biases
 
+train_model(1,1,1,1,1)
 def export_model(weights, biases)
 	Write_file(weights, biases)
 

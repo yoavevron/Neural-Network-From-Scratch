@@ -8,9 +8,12 @@ def main():
 										  hidden_layers=(16,16),
 										  output_layer=10,
 										  epochs=10)
-		neural_network.evaluate(w, b, test_dir)
-	elif (user_choice == 2):
+		neural_network.evaluate(w, b, test_dir="")
+	elif (user_choice == "2"):
 		neural_network.predict(image_path, model_path)
+	else:
+		print("Answer must be 1 or 2")
+
 
 if __name__ == "__main__":
 	main()
