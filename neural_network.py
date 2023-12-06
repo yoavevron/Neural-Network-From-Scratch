@@ -2,11 +2,13 @@ import initial_model_values
 import activation_function
 import loss_functions
 import optimizers
+import numpy as np
+import os
 import pandas as pd
 from tqdm import tqdm
 import datetime
 
-def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
+def train_model(train_dir, hidden_layers, output_layer, epochs):
 	"""
 	Main training function that run all the necessary calculations
 	:param train_src:
@@ -16,12 +18,13 @@ def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
 	:param epochs:
 	:return:
 	"""
-	images, labels = load_data(train_src)  # Read train data from csv to arrays
+	images, labels, input_size = load_data(train_dir)  # Read train data from csv to arrays
+	return
 	weights = initial_model_values.xavier_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.xavier_bias_init(input_size, hidden_layers, output_layer)
 	for epoch in tqdm(epochs):
 		for img in images:
-			neurons = initial_model_values.load_neurons(img)
+			neurons = initial_model_values.load_neurons(input_size)
 			'''Run the network to get predicted value'''
 			model_prediction = forward_propagation(neurons, weights, biases)
 
@@ -45,11 +48,32 @@ def export_model(weights, bias):
 
 
 def load_data(train_src):
-	print("implement")
-	return "images", "labels"
+	"""
+	Load all the supervised train data from the directory provided into two np arrays
+	:param train_src: directory path of the train data (csv files)
+	:return: a numpy array of train data, a numpy array of train labels, input layer size
+	"""
+	print("Dataset load started...")
+	all_files = os.listdir(train_src)
+	csv_files = [file for file in all_files if file.endswith('.csv')]
+	images = []
+	labels = np.array([])
+	for csv_file in csv_files:
+		file_path = os.path.join(train_src, csv_file)
+		df = pd.read_csv(file_path)
+		label = np.array(df['label'])
+		labels = np.concatenate((labels, label))
+		image = df.iloc[:, 1:]
+		images.append(image)
+	images_df = pd.concat(images)
+	images = images_df.to_numpy()
+	input_size = images.shape[1]
+	print("Dataset load finished!")
+	print("Input layer size is {0} according to the train data.".format(input_size))
+	return images, labels, input_size
 
 
-def evaluate(w, b, test_dir):
+def evaluate(model_path, test_dir):
 	print('hi')
 # Test the data on predict many times to calculate accuracy
 # Export excel of the image, predicted, real value using pandas
@@ -64,8 +88,9 @@ def forward_propagation(neurons, weights, biases):
 		return neurons, max(neurons[-1])
 
 
-def predict(img, weights, biases):
-	neurons = initial_model_values.load_neurons(img)
+def predict(image_path, model_path):
+	weights, biases = import_model(model_path)
+	neurons = initial_model_values.load_neurons(image_path)
 	forward_propagation(neurons, weights, biases)
 
 
