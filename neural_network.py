@@ -2,11 +2,12 @@ import initial_model_values
 import activation_function
 import loss_functions
 import optimizers
+import pandas as pd
 from tqdm import tqdm
 import datetime
 
 def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
-	'''
+	"""
 	Main training function that run all the necessary calculations
 	:param train_src:
 	:param input_size:
@@ -14,8 +15,8 @@ def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
 	:param output_layer:
 	:param epochs:
 	:return:
-	'''
-	images, labels = load_data(train_src) # Read train data from csv to arrays
+	"""
+	images, labels = load_data(train_src)  # Read train data from csv to arrays
 	weights = initial_model_values.xavier_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.xavier_bias_init(input_size, hidden_layers, output_layer)
 	for epoch in tqdm(epochs):
@@ -25,13 +26,11 @@ def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
 			model_prediction = forward_propagation(neurons, weights, biases)
 
 			'''Calculate a scalar of diff between prediction and real val'''
-			cost = loss_function(model_prediction, labels[images.indexof(img)])
+			cost = loss_functions.cross_entropy(model_prediction, labels[images.indexof(img)])
 
-			'''Run the network backwards to calculate gradients'''
-			gradients = compute_gradients(cost, neurons, weights, biases)
-
-			'''Optimize the weights and biases with the gradients'''
-			weights, bias = optimize(neurons, weights, biases, hidden_layers)
+			'''Run the network backwards to calculate gradients
+			Optimize the weights and biases with the gradients'''
+			weights, bias = optimizers.adam(cost, neurons, weights, biases, hidden_layers)
 		print(cost)
 	export_model(weights, bias)
 	return weights, bias
@@ -63,3 +62,18 @@ def forward_propagation(neurons, weights, biases):
 			neurons[i+1][n] = activation_function.relu(weights[0].multiple(neurons)+biases[i][n])
 		# all a.function are relu except last->softmax
 		return neurons, max(neurons[-1])
+
+
+def predict(img, weights, biases):
+	neurons = initial_model_values.load_neurons(img)
+	forward_propagation(neurons, weights, biases)
+
+
+def import_model(model_path):
+	data_frame = pd.read_csv(model_path)
+	return data_frame.loc[0], data_frame.loc[1]
+
+
+def visualize_result(img, neurons, weights, predicted_output, real_output):
+	print("draw")
+	return "drawing"

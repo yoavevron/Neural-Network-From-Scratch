@@ -1,5 +1,6 @@
 import neural_network
 
+
 def main():
 	user_choice = input("(1) Train model\n(2) Predict value\n")
 	if (user_choice == "1"):
@@ -10,7 +11,7 @@ def main():
 										  epochs=10)
 		neural_network.evaluate(w, b, test_dir="")
 	elif (user_choice == "2"):
-		neural_network.predict(image_path, model_path)
+		neural_network.outputpredict(image_path, model_path)
 	else:
 		print("Answer must be 1 or 2")
 
