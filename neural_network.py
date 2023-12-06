@@ -1,3 +1,5 @@
+import initial_model_values
+
 def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
     '''
     Main training function that run all the necessary calculations
