@@ -1,5 +1,6 @@
 import initial_model_values
 from tqdm import tqdm
+import datetime
 
 def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
 	'''
@@ -25,30 +26,34 @@ def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
 			'''Run the network backwards to calculate gradients'''
 			gradients = compute_gradients(cost, neurons, weights, biases)
 
-            '''Optimize the weights and biases with the gradients'''
-			Weights, biases = optimize(img, weights, biases, layers)
-		Print(loss)
-    Export_model(weights, biases)
-    Return weights, biases
+			'''Optimize the weights and biases with the gradients'''
+			weights, bias = optimize(img, weights, biases, layers)
+		print(cost)
+	export_model(weights, bias)
+	return weights, bias
 
 train_model(1,1,1,1,1)
-def export_model(weights, biases)
-	Write_file(weights, biases)
+def export_model(weights, bias):
+	output_file_name = "model_" + str(datetime.now())
+	f = open(output_file_name, "w")
+	f.write(str(weights))
+	f.write(str(bias))
+	f.close()
 
 def load_data(train_src):
-    print("implement")
-    return "images", "labels"
+	print("implement")
+	return "images", "labels"
 
-Def evaluate(w, b, test_dir):
+def evaluate(w, b, test_dir):
 # Test the data on predict many times to calculate accuracy
 # Export excel of the image, predicted, real value using pandas
 # Save all the test images with predicted and real value using matplotlib
 
-Def Forward_propogation(img, weights, biases)
-neurons = generate_neruns_values(img)
-For i in range(len(weights):
-	For n in neurons[i+1]:
-		neurons[i+1][n] =
-activation_function(weights[0].multiple(neurons)+biases[i][n])
-# all a.function are relu except last->softmax
-	return neurons, max(neurons[-1])
+def forward_propogation(img, weights, biases):
+	neurons = generate_neruns_values(img)
+	For i in range(len(weights):
+		For n in neurons[i+1]:
+			neurons[i+1][n] =
+	activation_function(weights[0].multiple(neurons)+biases[i][n])
+	# all a.function are relu except last->softmax
+		return neurons, max(neurons[-1])
