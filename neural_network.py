@@ -1,4 +1,7 @@
 import initial_model_values
+import activation_function
+import loss_functions
+import optimizers
 from tqdm import tqdm
 import datetime
 
@@ -17,8 +20,9 @@ def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
 	biases = initial_model_values.xavier_bias_init(input_size, hidden_layers, output_layer)
 	for epoch in tqdm(epochs):
 		for img in images:
+			neurons = initial_model_values.load_neurons(img)
 			'''Run the network to get predicted value'''
-			model_prediction = feed_forward(img, weights, biases)
+			model_prediction = forward_propagation(neurons, weights, biases)
 
 			'''Calculate a scalar of diff between prediction and real val'''
 			cost = loss_function(model_prediction, labels[images.indexof(img)])
@@ -27,12 +31,12 @@ def train_model(train_src, input_size, hidden_layers, output_layer, epochs):
 			gradients = compute_gradients(cost, neurons, weights, biases)
 
 			'''Optimize the weights and biases with the gradients'''
-			weights, bias = optimize(img, weights, biases, layers)
+			weights, bias = optimize(neurons, weights, biases, hidden_layers)
 		print(cost)
 	export_model(weights, bias)
 	return weights, bias
 
-train_model(1,1,1,1,1)
+
 def export_model(weights, bias):
 	output_file_name = "model_" + str(datetime.now())
 	f = open(output_file_name, "w")
@@ -40,20 +44,22 @@ def export_model(weights, bias):
 	f.write(str(bias))
 	f.close()
 
+
 def load_data(train_src):
 	print("implement")
 	return "images", "labels"
 
+
 def evaluate(w, b, test_dir):
+	print('hi')
 # Test the data on predict many times to calculate accuracy
 # Export excel of the image, predicted, real value using pandas
 # Save all the test images with predicted and real value using matplotlib
 
-def forward_propogation(img, weights, biases):
-	neurons = generate_neruns_values(img)
-	For i in range(len(weights):
-		For n in neurons[i+1]:
-			neurons[i+1][n] =
-	activation_function(weights[0].multiple(neurons)+biases[i][n])
-	# all a.function are relu except last->softmax
+
+def forward_propagation(neurons, weights, biases):
+	for i in range(len(weights)):
+		for n in neurons[i+1]:
+			neurons[i+1][n] = activation_function.relu(weights[0].multiple(neurons)+biases[i][n])
+		# all a.function are relu except last->softmax
 		return neurons, max(neurons[-1])
