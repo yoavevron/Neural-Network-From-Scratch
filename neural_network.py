@@ -8,21 +8,21 @@ import pandas as pd
 from tqdm import tqdm
 import datetime
 
+
 def train_model(train_dir, hidden_layers, output_layer, epochs):
 	"""
 	Main training function that run all the necessary calculations
-	:param train_src:
-	:param input_size:
+	:param train_dir:
 	:param hidden_layers:
 	:param output_layer:
 	:param epochs:
 	:return:
 	"""
 	images, labels, input_size = load_data(train_dir)  # Read train data from csv to arrays
+	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
 	return
-	weights = initial_model_values.xavier_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.xavier_bias_init(input_size, hidden_layers, output_layer)
-	for epoch in tqdm(epochs):
+	for epoch in tqdm(range(epochs)):
 		for img in images:
 			neurons = initial_model_values.load_neurons(input_size)
 			'''Run the network to get predicted value'''
