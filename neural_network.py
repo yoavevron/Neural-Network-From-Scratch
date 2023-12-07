@@ -20,11 +20,11 @@ def train_model(train_dir, hidden_layers, output_layer, epochs):
 	"""
 	images, labels, input_size = load_data(train_dir)  # Read train data from csv to arrays
 	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
-	biases = initial_model_values.random_bias_init(input_size, hidden_layers, output_layer)
-	return
+	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
 	for epoch in tqdm(range(epochs)):
 		for img in images:
-			neurons = initial_model_values.load_neurons(input_size)
+			neurons = initial_model_values.load_neurons(img, hidden_layers, output_layer)
+			return
 			'''Run the network to get predicted value'''
 			model_prediction = forward_propagation(neurons, weights, biases)
 

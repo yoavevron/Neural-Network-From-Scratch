@@ -43,8 +43,23 @@ def random_bias_init(hidden_layers, output_size):
     return biases
 
 
-def load_neurons(img):
-    neurons = np.zeros(img)
+def load_neurons(img, hidden_layers, output_layer):
+    """
+    Create a list of np arrays that will represent the neurons of the model.
+    first layer is image pixels than the others are zeros in according to layers size.
+    :param img: img pixels list
+    :param hidden_layers: a tuple that represent the size of the hidden layers
+    :param output_layer: a scalar that represent the output layer size
+    :return: a list of 1d np arrays of the neurons for the model as described
+    """
+    neurons = []
+    layer = img/255.0
+    neurons.append(layer)
+    for i in range(len(hidden_layers)):
+        layer = np.zeros(hidden_layers[i])
+        neurons.append(layer)
+    layer = np.zeros(output_layer)
+    neurons.append(layer)
     return neurons
 
 
