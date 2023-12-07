@@ -1,5 +1,5 @@
 import initial_model_values
-import activation_function
+import activation_functions
 import loss_functions
 import optimizers
 import numpy as np
@@ -22,29 +22,23 @@ def train_model(train_dir, hidden_layers, output_layer, epochs):
 	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
 	for epoch in tqdm(range(epochs)):
-		for img in images:
-			neurons = initial_model_values.load_neurons(img, hidden_layers, output_layer)
-			return
+		for i in tqdm(range(len(images))):
+			neurons = initial_model_values.load_neurons(images[i], hidden_layers, output_layer)
+
 			'''Run the network to get predicted value'''
 			model_prediction = forward_propagation(neurons, weights, biases)
 
 			'''Calculate a scalar of diff between prediction and real val'''
-			cost = loss_functions.cross_entropy(model_prediction, labels[images.indexof(img)])
+			cost = loss_functions.categorical_cross_entropy(model_prediction, labels[i])
 
 			'''Run the network backwards to calculate gradients
 			Optimize the weights and biases with the gradients'''
-			weights, bias = optimizers.adam(cost, neurons, weights, biases, hidden_layers)
-		print(cost)
-	export_model(weights, bias)
-	return weights, bias
-
-
-def export_model(weights, bias):
-	output_file_name = "model_" + str(datetime.now())
-	f = open(output_file_name, "w")
-	f.write(str(weights))
-	f.write(str(bias))
-	f.close()
+			weights, biases = optimizers.stochastic_gradient_descent(cost, neurons, weights, biases)
+			print(weights[0])
+			print(biases[0])
+			return
+	export_model(weights, biases)
+	return weights, biases
 
 
 def load_data(train_src):
@@ -73,6 +67,33 @@ def load_data(train_src):
 	return images, labels, input_size
 
 
+def forward_propagation(neurons, weights, bias):
+	"""
+	Run the feed forward process using the weights, biases and activation function
+	to calculate the output of the model for the neurons that were inserted
+	For now I set for this model relu for all layers except the last one which has not activation function
+	:param neurons: a list of 1d arrays represent the neurons of the model. first layer is image pixels, all the others initially zeros
+	:param weights: weights of the model to compute output
+	:param bias: biases of the model to compute output
+	:return: a softmax probabilities vector of the output to the inserted input image
+	"""
+	for i in range(1, len(neurons)-1):
+		neurons[i] = neurons[i-1].dot(weights[i-1])
+		neurons[i] = neurons[i] + bias[i-1]
+		neurons[i] = activation_functions.relu(neurons[i])
+	neurons[-1] = neurons[-2].dot(weights[-1])
+	neurons[-1] = neurons[-1] + bias[-1]
+	return neurons[-1]
+
+
+def export_model(weights, bias):
+	output_file_name = "model_" + str(datetime.now())
+	f = open(output_file_name, "w")
+	f.write(str(weights))
+	f.write(str(bias))
+	f.close()
+
+
 def evaluate(model_path, test_dir):
 	print('hi')
 # Test the data on predict many times to calculate accuracy
@@ -80,15 +101,8 @@ def evaluate(model_path, test_dir):
 # Save all the test images with predicted and real value using matplotlib
 
 
-def forward_propagation(neurons, weights, biases):
-	for i in range(len(weights)):
-		for n in neurons[i+1]:
-			neurons[i+1][n] = activation_function.relu(weights[0].multiple(neurons)+biases[i][n])
-		# all a.function are relu except last->softmax
-		return neurons, max(neurons[-1])
-
-
 def predict(image_path, model_path):
+	# print(np.argmax(model_prediction_vector)) after getting output
 	weights, biases = import_model(model_path)
 	neurons = initial_model_values.load_neurons(image_path)
 	forward_propagation(neurons, weights, biases)

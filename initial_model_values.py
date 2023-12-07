@@ -17,12 +17,12 @@ def random_weights_init(input_size, hidden_layers, output_size):
     :return: A list of 2d np arrays that represent the weights between the layers
     """
     weights = []
-    layer = random.rand(input_size, hidden_layers[0])
+    layer = random.randn(input_size, hidden_layers[0])
     weights.append(layer)
     for i in range(len(hidden_layers[:-1])):
-        layer = random.rand(hidden_layers[i], hidden_layers[i+1])
+        layer = random.randn(hidden_layers[i], hidden_layers[i+1])
         weights.append(layer)
-    layer = random.rand(hidden_layers[-1], output_size)
+    layer = random.randn(hidden_layers[-1], output_size)
     weights.append(layer)
     return weights
 
@@ -36,9 +36,9 @@ def random_bias_init(hidden_layers, output_size):
     """
     biases = []
     for i in range(len(hidden_layers)):
-        layer = random.rand(hidden_layers[i])
+        layer = random.randn(hidden_layers[i])
         biases.append(layer)
-    layer = random.rand(output_size)
+    layer = random.randn(output_size)
     biases.append(layer)
     return biases
 
@@ -56,9 +56,9 @@ def load_neurons(img, hidden_layers, output_layer):
     layer = img/255.0
     neurons.append(layer)
     for i in range(len(hidden_layers)):
-        layer = np.zeros(hidden_layers[i])
+        layer = np.zeros((1, hidden_layers[i]))
         neurons.append(layer)
-    layer = np.zeros(output_layer)
+    layer = np.zeros((1, output_layer))
     neurons.append(layer)
     return neurons
 
