@@ -2,14 +2,10 @@ import numpy as np
 from numpy import random
 
 
-def load_neurons(img):
-    neurons = np.zeros(img)
-    return neurons
-
-
 ''' Random Gaussian : mean=0, standard deviation=1. widely used and often works well.
+    He: Gaussian distribution with mean=0 and variance=2/n_in. effective for relu activation function.
     Xavier: Gaussian mean=0 and variance=2/(n_in + n_out). effective for sigmoid activation function.
-    He: Gaussian distribution with mean=0 and variance=2/n_in. effective for relu activation function.'''
+    '''
 
 
 def random_weights_init(input_size, hidden_layers, output_size):
@@ -31,23 +27,36 @@ def random_weights_init(input_size, hidden_layers, output_size):
     return weights
 
 
-def random_bias_init(input_size, hidden_layers, output_size):
-    bias =[]
-    return bias
+def random_bias_init(hidden_layers, output_size):
+    """
+    Sets initiated random float values for the biases according to layers size with normal gaussian distribution
+    :param hidden_layers: tuple that represent the hidden layers. for example (16,16)
+    :param output_size: Size of the output layer
+    :return: A list of 1d np arrays that represent the biases between the layers
+    """
+    biases = []
+    for i in range(len(hidden_layers)):
+        layer = random.rand(hidden_layers[i])
+        biases.append(layer)
+    layer = random.rand(output_size)
+    biases.append(layer)
+    return biases
+
+
+def load_neurons(img):
+    neurons = np.zeros(img)
+    return neurons
+
+
+''' Implement '''
 
 
 def he_weights_init(input_size, hidden_layers, output_size):
-    neurons = np.zeros(hidden_layers)
-    weights = np.zeros(hidden_layers)
-    bias = np.zeros(hidden_layers)
-    return neurons, weights, bias
+    return 1
 
 
-def he_bias_init(input_size, hidden_layers, output_size):
-    neurons = np.zeros(hidden_layers)
-    weights = np.zeros(hidden_layers)
-    bias = np.zeros(hidden_layers)
-    return neurons, weights, bias
+def he_bias_init(hidden_layers, output_size):
+    return 1
 
 
 def xavier_weights_init(input_size, hidden_layers, output_size):
@@ -56,14 +65,8 @@ def xavier_weights_init(input_size, hidden_layers, output_size):
     #     np_array[i] = [layers[i], layers[i+1]]
     # 	np_array.values = smart_random_values
     # 	return np_array
-    neurons = np.zeros(hidden_layers)
-    weights = np.zeros(hidden_layers)
-    bias = np.zeros(hidden_layers)
-    return neurons, weights, bias
+    return 1
 
 
-def xavier_bias_init(input_size, hidden_layers, output_size):
-    neurons = np.zeros(hidden_layers)
-    weights = np.zeros(hidden_layers)
-    bias = np.zeros(hidden_layers)
-    return neurons, weights, bias
+def xavier_bias_init(hidden_layers, output_size):
+    return 1
