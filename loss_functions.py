@@ -1,21 +1,28 @@
-def cross_entropy(y_true, y_pred):  # Often used for classification
+import numpy as np
+import activation_functions
+
+
+# Often used for classification
+def categorical_cross_entropy(model_prediction_vector, real_output):
     """
-    :param y_true: arrayyyyy
-    :param y_pred: arrayyyyy
-    :return:
+    Gets the loss/cost between a predicted probabilities vector and a real output number
+    :param model_prediction_vector: a 1d np array of model output probabilities for a result
+    :param real_output: real output as a scalar
+    :return: the loss between the input vector and the real output after converted to vector
     """
-    print("1")
-    #  item in y_true that represent the number 3 will be: [0,0,0,1,0,0,0,0,0,0]
-    # Pred = np.arra(0, pred)
-    # # the equivalent before softmax (logits) will be: [0.02, 0.1, 0.05, 0.84, 0, 0, 0 ,0, 0 ,0]
-    #   epsilon = 1e-15
-    # exp_logits = np.exp(logits - np.max(logits, axis=-1, keepdims=True)
-    #   softmax_probs = exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)
-    # y_pred = np.clip(softmax_probs, epsilon, 1 - epsilon)
-    # loss = -np.sum(y_true * np.log(y_pred))
-    # num_samples = y_true.shape[0]
-    # loss /= num_samples
-    # return loss
+    real_output_vector = np.zeros(len(model_prediction_vector))
+    real_output_vector[int(real_output)] = 1
+
+    model_prediction_vector = activation_functions.softmax(model_prediction_vector)
+
+    epsilon = 1e-15
+    x = np.clip(model_prediction_vector, epsilon, 1 - epsilon)
+    loss = -np.sum(real_output_vector * np.log(x)) / real_output_vector.shape[0]
+    return loss
+
+
+''' Implement '''
+
 
 def mean_squared_error():  # Often used  for regression
     return 1

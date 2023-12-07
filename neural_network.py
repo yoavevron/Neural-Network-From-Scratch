@@ -22,14 +22,15 @@ def train_model(train_dir, hidden_layers, output_layer, epochs):
 	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
 	for epoch in tqdm(range(epochs)):
-		for img in images:
-			neurons = initial_model_values.load_neurons(img, hidden_layers, output_layer)
+		for i in range(len(images)):
+			neurons = initial_model_values.load_neurons(images[i], hidden_layers, output_layer)
 
 			'''Run the network to get predicted value'''
 			model_prediction = forward_propagation(neurons, weights, biases)
-			return
+
 			'''Calculate a scalar of diff between prediction and real val'''
-			cost = loss_functions.cross_entropy(model_prediction, labels[images.indexof(img)])
+			cost = loss_functions.categorical_cross_entropy(model_prediction, labels[i])
+			return
 
 			'''Run the network backwards to calculate gradients
 			Optimize the weights and biases with the gradients'''
@@ -69,7 +70,7 @@ def forward_propagation(neurons, weights, bias):
 	"""
 	Run the feed forward process using the weights, biases and activation function
 	to calculate the output of the model for the neurons that were inserted
-	For now I set for this model relu for all layers except the last one - softmax
+	For now I set for this model relu for all layers except the last one which has not activation function
 	:param neurons: a list of 1d arrays represent the neurons of the model. first layer is image pixels, all the others initially zeros
 	:param weights: weights of the model to compute output
 	:param bias: biases of the model to compute output
@@ -81,7 +82,6 @@ def forward_propagation(neurons, weights, bias):
 		neurons[i] = activation_functions.relu(neurons[i])
 	neurons[-1] = neurons[-2].dot(weights[-1])
 	neurons[-1] = neurons[-1] + bias[-1]
-	neurons[-1] = activation_functions.softmax(neurons[-1])
 	return neurons[-1]
 
 
@@ -101,6 +101,7 @@ def evaluate(model_path, test_dir):
 
 
 def predict(image_path, model_path):
+	# print(np.argmax(model_prediction_vector)) after getting output
 	weights, biases = import_model(model_path)
 	neurons = initial_model_values.load_neurons(image_path)
 	forward_propagation(neurons, weights, biases)
