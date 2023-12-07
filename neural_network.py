@@ -22,7 +22,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs):
 	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
 	for epoch in tqdm(range(epochs)):
-		for i in range(len(images)):
+		for i in tqdm(range(len(images))):
 			neurons = initial_model_values.load_neurons(images[i], hidden_layers, output_layer)
 
 			'''Run the network to get predicted value'''
@@ -30,14 +30,15 @@ def train_model(train_dir, hidden_layers, output_layer, epochs):
 
 			'''Calculate a scalar of diff between prediction and real val'''
 			cost = loss_functions.categorical_cross_entropy(model_prediction, labels[i])
-			return
 
 			'''Run the network backwards to calculate gradients
 			Optimize the weights and biases with the gradients'''
-			weights, bias = optimizers.adam(cost, neurons, weights, biases, hidden_layers)
-		print(cost)
-	export_model(weights, bias)
-	return weights, bias
+			weights, biases = optimizers.stochastic_gradient_descent(cost, neurons, weights, biases)
+			print(weights[0])
+			print(biases[0])
+			return
+	export_model(weights, biases)
+	return weights, biases
 
 
 def load_data(train_src):

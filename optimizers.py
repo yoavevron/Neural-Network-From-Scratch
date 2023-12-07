@@ -1,4 +1,4 @@
-def stochastic_gradient_descent():
+def stochastic_gradient_descent(cost, neurons, weights, biases):
     return 1
 
 
