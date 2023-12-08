@@ -9,34 +9,46 @@ from tqdm import tqdm
 import datetime
 
 
-def train_model(train_dir, hidden_layers, output_layer, epochs):
-	"""
-	Main training function that run all the necessary calculations
-	:param train_dir:
-	:param hidden_layers:
-	:param output_layer:
-	:param epochs:
-	:return:
-	"""
+def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 	images, labels, input_size = load_data(train_dir)  # Read train data from csv to arrays
 	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
+
+	num_samples = images.shape[0]
 	for epoch in tqdm(range(epochs)):
-		for i in tqdm(range(len(images))):
-			neurons = initial_model_values.load_neurons(images[i], hidden_layers, output_layer)
+		indices = np.arange(num_samples)
+		np.random.shuffle(indices)
+		batch_loss = 0
 
-			'''Run the network to get predicted value'''
-			model_prediction = forward_propagation(neurons, weights, biases)
+		for start in tqdm(range(0, num_samples, batch_size)):
+			end = start + batch_size
+			batch_indices = indices[start:end]
 
-			'''Calculate a scalar of diff between prediction and real val'''
-			cost = loss_functions.categorical_cross_entropy(model_prediction, labels[i])
+			images_batch = images[batch_indices]
+			labels_batch = labels[batch_indices]
 
-			'''Run the network backwards to calculate gradients
-			Optimize the weights and biases with the gradients'''
-			weights, biases = optimizers.stochastic_gradient_descent(cost, neurons, weights, biases)
-			print(weights[0])
-			print(biases[0])
-			return
+			for i in range(batch_size):
+				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
+
+				'''Run the network to get predicted value'''
+				neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
+				model_prediction = neurons[-1]
+
+				'''Calculate a scalar of diff between prediction and real val'''
+				cost = loss_functions.categorical_cross_entropy(model_prediction, labels_batch[i])
+				batch_loss += cost
+
+				old = weights.copy()
+				'''Run the network backwards to calculate gradients
+				Optimize the weights and biases with the gradients'''
+				weights, biases = optimizers.stochastic_gradient_descent(
+					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
+					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
+				# weights, biases = optimizers.backward_pass(
+				# 	X=images_batch[i], y_true=labels_batch[i], hidden_inputs=neurons_before_active[1:],
+				# 	hidden_outputs=neurons[1:], weights=weights, biases=biases, learning_rate=0.001)
+		print("Epoch: {0}.\t loss: {1}". format(epoch, batch_loss/batch_size))
+	return
 	export_model(weights, biases)
 	return weights, biases
 
@@ -77,13 +89,16 @@ def forward_propagation(neurons, weights, bias):
 	:param bias: biases of the model to compute output
 	:return: a softmax probabilities vector of the output to the inserted input image
 	"""
+	neurons_before_active = []
 	for i in range(1, len(neurons)-1):
 		neurons[i] = neurons[i-1].dot(weights[i-1])
 		neurons[i] = neurons[i] + bias[i-1]
+		neurons_before_active.append(neurons[i])
 		neurons[i] = activation_functions.relu(neurons[i])
 	neurons[-1] = neurons[-2].dot(weights[-1])
 	neurons[-1] = neurons[-1] + bias[-1]
-	return neurons[-1]
+	neurons_before_active.append(neurons[-1])
+	return neurons, neurons_before_active
 
 
 def export_model(weights, bias):
