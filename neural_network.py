@@ -5,9 +5,8 @@ import optimizers
 import numpy as np
 import os
 import pandas as pd
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from datetime import datetime
-import cv2
 
 
 def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
@@ -20,8 +19,8 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 		total_loss = 0
 		indices = np.arange(num_samples)
 		np.random.shuffle(indices)
-
-		for start in tqdm(range(0, num_samples, batch_size)):
+		for start in range(0, num_samples, batch_size):
+			# print(f"batch: {(start+1)/batch_size}")
 			end = start + batch_size
 			batch_indices = indices[start:end]
 
@@ -29,6 +28,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 			labels_batch = labels[batch_indices]
 
 			for i in range(batch_size):
+				# print(f"image: {batch_indices[i]}")
 				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
 
 				'''Run the network to get predicted value'''
@@ -44,7 +44,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 				weights, biases = optimizers.stochastic_gradient_descent(
 					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
 					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
-		print("Epoch: " + str(epoch) + ", loss: " + str(total_loss/batch_size))
+		print(f"Epoch: {str(epoch)} loss: {str(total_loss/batch_size)}")
 	export_model(weights, biases)
 	return weights, biases
 
@@ -52,7 +52,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 def load_data(src):
 	"""
 	Load all the supervised train data from the directory provided into two np arrays
-	:param train_src: directory path of the train data (csv files)
+	:param src: directory path of the train data (csv files)
 	:return: a numpy array of train data, a numpy array of train labels, input layer size
 	"""
 	print("Dataset load started...")
@@ -79,8 +79,9 @@ def forward_propagation(neurons, weights, bias):
 	"""
 	Run the feed forward process using the weights, biases and activation function
 	to calculate the output of the model for the neurons that were inserted
-	For now I set for this model relu for all layers except the last one which has not activation function
-	:param neurons: a list of 1d arrays represent the neurons of the model. first layer is image pixels, all the others initially zeros
+	For now I set for this model relu for all layers except the last one which has no activation function
+	:param neurons: a list of 1d arrays represent the neurons of the model.
+	first layer is image pixels, all the others initially zeros
 	:param weights: weights of the model to compute output
 	:param bias: biases of the model to compute output
 	:return: a softmax probabilities vector of the output to the inserted input image
@@ -101,8 +102,8 @@ def export_model(weights, biases):
 	"""
 	export the weights and biases for future usages
 	:param weights: resulted output of the model
-	:param biases: reuslted biases of the model
-	:return: create a directory for the model and save the weights and biases in differnet files
+	:param biases: resulted biases of the model
+	:return: create a directory for the model and save the weights and biases in different files
 	"""
 	model_name = str(datetime.now())[:19]
 	new_model_name = model_name.replace(":", "_")
@@ -130,8 +131,8 @@ def evaluate():
 		prediction = predict(test_images[i], weights, biases)
 		if prediction == test_labels[i]:
 			correct_predictions += 1
-	model_accuarcy = str(correct_predictions * 100 / len(test_labels))[:6]
-	print(f"\n{model_path} accuarcy is: {model_accuarcy}")
+	model_accuracy = str(correct_predictions * 100 / len(test_labels))[:6]
+	print(f"\n{model_path} accuracy is: {model_accuracy}")
 	''' IMPLEMENT - export evaluation excel of every correct/incorrect image prediction and total accuracy result'''
 
 
@@ -144,7 +145,7 @@ def predict(input_layer, weights, biases):
 	:return: the predicted output of the model
 	"""
 	neurons = initial_model_values.load_neurons(
-		img=input_layer, hidden_layers=np.array([len(arr) for arr in biases[:-1]]),output_layer=len(biases[-1]))
+		img=input_layer, hidden_layers=np.array([len(arr) for arr in biases[:-1]]), output_layer=len(biases[-1]))
 	neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
 	model_result = np.argmax(activation_functions.softmax(neurons[-1]))
 	print(f"The prediction for that image is: {model_result}")
@@ -187,6 +188,8 @@ def import_model(model_path):
 
 
 def visualize_result(img, predicted_output):
+	print(img)
+	print(predicted_output)
 	return "draw an image with its label"
 
 
@@ -195,4 +198,5 @@ def draw_network(img, neurons, weights, predicted_output, real_output):
 	a function that draw the activation neurons of a network
 	:return:
 	"""
+	print(img, neurons, weights, predicted_output, real_output)
 	return 1

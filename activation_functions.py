@@ -10,8 +10,8 @@ def relu_derivative(x):
 
 
 def softmax(layer):  # Often used for multiclass classification
-    exp_x = np.exp(layer - np.max(layer))  # Subtracting np.max(x) for numerical stability
-    return exp_x / np.sum(exp_x, axis=0)
+    exp_x = np.exp(layer - np.max(layer, axis=0, keepdims=True))  # Subtracting np.max(x) for numerical stability
+    return exp_x / np.sum(exp_x, axis=0, keepdims=True)
 
 
 def softmax_derivative(x):

@@ -1,10 +1,12 @@
 import neural_network
 import numpy as np
 import cv2
+import os
+import image_handling
 
 
 def main():
-	user_choice = input("(1) Train model\n(2) Evaluate model\n(3) Predict value\n\nWhat your wanna do?\nUser: ")
+	user_choice = input("(1) Train model\n(2) Evaluate model\n(3) Predict value\n\nWhat you wanna do? User: ")
 	if user_choice == "1":
 		print("you choice: training a model\n")
 		neural_network.train_model(
@@ -15,7 +17,7 @@ def main():
 		neural_network.evaluate()
 	elif user_choice == "3":
 		print("you choice: predicting an output\n")
-		image = cv2.imread("image_path")
+		image = cv2.imread("Images\\Test\\4.png")
 		input_layer = 0
 		if image is not None:
 			input_layer = image.flatten()
