@@ -18,7 +18,6 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 	for epoch in tqdm(range(epochs)):
 		indices = np.arange(num_samples)
 		np.random.shuffle(indices)
-		batch_loss = 0
 
 		for start in tqdm(range(0, num_samples, batch_size)):
 			end = start + batch_size
@@ -26,6 +25,8 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 			images_batch = images[batch_indices]
 			labels_batch = labels[batch_indices]
+
+			batch_loss = 0
 
 			for i in range(batch_size):
 				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
@@ -37,6 +38,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 				'''Calculate a scalar of diff between prediction and real val'''
 				cost = loss_functions.categorical_cross_entropy(model_prediction, labels_batch[i])
 				batch_loss += cost
+				print(cost)
 
 				old = weights.copy()
 				'''Run the network backwards to calculate gradients
@@ -44,10 +46,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 				weights, biases = optimizers.stochastic_gradient_descent(
 					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
 					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
-				# weights, biases = optimizers.backward_pass(
-				# 	X=images_batch[i], y_true=labels_batch[i], hidden_inputs=neurons_before_active[1:],
-				# 	hidden_outputs=neurons[1:], weights=weights, biases=biases, learning_rate=0.001)
-		print("Epoch: {0}.\t loss: {1}". format(epoch, batch_loss/batch_size))
+				print("loss: " + str(batch_loss/batch_size))
 	return
 	export_model(weights, biases)
 	return weights, biases
