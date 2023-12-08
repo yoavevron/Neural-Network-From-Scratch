@@ -1,13 +1,13 @@
 # Basic Artificial Neural Network
 
-- Have tried to implementat the simplest fully connected Multi Layer Perceptron
+- Have tried to implememt the simplest fully connected Multi Layer Perceptron
 - Only usage of mathematics and numpy (without tensorflow/pytorch)
 - Intended for hand-written digits image classification (MNIST Data Set)
 
 ## How to use
 * Run main.py
 ### Adjusting network parameters 
-Inside the **neural_network.train_model** function in **main.py** adjust:
+Inside the **main.py** adjust:
 * The parameters that are given to neural_network.train_model
 * The image to predict
 * Note: when choosing evaluating you'll be asked to choose a model to evaluate
