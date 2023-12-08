@@ -121,8 +121,8 @@ def evaluate(test_dir):
 	'''Test the data on predict many times to calculate accuracy
 	Export excel of the image, predicted, real value using pandas
 	Save all the test images with predicted and real value using matplotlib'''
-	model = ui_choose_model()
-	# Import the model
+	model_path = ui_choose_model()
+	weights, biases = import_model(model_path)
 	# load the test data
 	# predict all the images
 	# sum the process' accuarcy
@@ -135,8 +135,7 @@ def predict(image_path):
 	:param model_path: path to the model that you want the user want to use for prediction
 	:return: the predicted output of the model
 	"""
-	model = ui_choose_model()
-	model_path = os.path.join("models", model)
+	model_path = ui_choose_model()
 	weights, biases = import_model(model_path)
 	image = cv2.imread(image_path)
 	input_layer = 0
@@ -162,12 +161,24 @@ def ui_choose_model():
 		print(f"({i}) {models[i]}")
 	model_index = str(input("\nPlease choose a model for evaluation: "))
 	print(f"Your choice: {models[int(model_index)]}")
-	return models[int(model_index)]
+	model = models[int(model_index)]
+	model_path = os.path.join("models", model)
+	return model_path
 
 
 def import_model(model_path):
-	data_frame = pd.read_csv(model_path)
-	return data_frame.loc[0], data_frame.loc[1]
+	"""
+	Load the weights and biases of a model by its path
+	:param model_path: the path of the model
+	:return: the weights and biases of the model
+	"""
+	weights_path = os.path.join(model_path, "weights.csv")
+	biases_path = os.path.join(model_path, "biases.csv")
+	weights = pd.read_csv(weights_path, header=None)
+	biases = pd.read_csv(biases_path, header=None)
+	weights = weights.values
+	biases = biases.values
+	return weights, biases
 
 
 ''' IMPLEMENT '''
