@@ -7,6 +7,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 from datetime import datetime
+import cv2
 
 
 def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
@@ -133,16 +134,40 @@ def evaluate(test_dir):
 
 
 def predict(image_path, model_path):
+	"""
+	Get a model (weight and biases) and a photo and run forward propagation to get a prediction
+	:param image_path: path to the image for prediction
+	:param model_path: path to the model that you want the user want to use for prediction
+	:return: the predicted output of the model
+	"""
 	weights, biases = import_model(model_path)
-	neurons = initial_model_values.load_neurons(image_path)
+	image = cv2.imread(image_path)
+	input_layer = 0
+	if image is not None:
+		input_layer = image.flatten()
+	neurons = initial_model_values.load_neurons(
+		img=input_layer, hidden_layers=np.array([len(arr) for arr in biases[:-1]]),output_layer=len(biases[-1]))
 	neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
-	return np.argmax(neurons[-1])
+	model_result = np.argmax(activation_functions.softmax(neurons[-1]))
+	print(f"The prediction for that image is: {model_result}")
+	visualize_result(img=image, predicted_output=model_result)
+	return model_result
 
 def import_model(model_path):
 	data_frame = pd.read_csv(model_path)
 	return data_frame.loc[0], data_frame.loc[1]
 
 
-def visualize_result(img, neurons, weights, predicted_output, real_output):
-	print("draw")
-	return "drawing"
+''' IMPLEMENT '''
+
+
+def visualize_result(img, predicted_output):
+	return "draw an image with its label"
+
+
+def draw_network(img, neurons, weights, predicted_output, real_output):
+	"""
+	a function that draw the activation neurons of a network
+	:return:
+	"""
+	return 1
