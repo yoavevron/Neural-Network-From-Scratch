@@ -1,4 +1,5 @@
 import neural_network
+import numpy as np
 
 
 def main():

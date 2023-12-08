@@ -6,7 +6,7 @@ import numpy as np
 import os
 import pandas as pd
 from tqdm import tqdm
-import datetime
+from datetime import datetime
 
 
 def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
@@ -100,12 +100,24 @@ def forward_propagation(neurons, weights, bias):
 	return neurons, neurons_before_active
 
 
-def export_model(weights, bias):
-	output_file_name = "model_" + str(datetime.now())
-	f = open(output_file_name, "w")
-	f.write(str(weights))
-	f.write(str(bias))
-	f.close()
+def export_model(weights, biases):
+	"""
+	export the weights and biases for future usages
+	:param weights: resulted output of the model
+	:param biases: reuslted biases of the model
+	:return: create a directory for the model and save the weights and biases in differnet files
+	"""
+	model_name = str(datetime.now())[:19]
+	new_model_name = model_name.replace(":", "_")
+	new_model_name = new_model_name.replace(" ", "_")
+	new_model_name = new_model_name.replace("-", "_")
+	model_directory = os.path.join("models", new_model_name)
+	if not os.path.exists(model_directory):
+		os.makedirs(model_directory)
+	output_weights_file_name = os.path.join(model_directory, "weights.csv")
+	output_bias_file_name = os.path.join(model_directory, "biases.csv")
+	np.savetxt(output_weights_file_name, weights, delimiter=',')
+	np.savetxt(output_bias_file_name, biases, delimiter=',')
 
 
 def evaluate(model_path, test_dir):
