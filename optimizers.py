@@ -2,16 +2,29 @@ import activation_functions
 import numpy as np
 
 
-def stochastic_gradient_descent(neurons_before, neurons_after, weights, biases, real, learning_rate):
+def stochastic_gradient_descent(img_pixels, neurons_before, neurons_after, weights, biases, real, learning_rate):
     real_output_vector = np.zeros(len(biases[-1]))
     real_output_vector[int(real)] = 1
-    output_layer_error = (activation_functions.softmax_derivative
-                          (activation_functions.softmax(neurons_before[-1])) *
-                          neurons_after[-1] - real_output_vector)
 
-    weights[-1] = weights[-1] - learning_rate * np.outer(neurons_after[-2].T, output_layer_error)
-    biases[-1] = biases[-1] - learning_rate * output_layer_error
+    previous_layer_error = (activation_functions.softmax_derivative
+                            (neurons_before[-1]) *
+                            neurons_after[-1] - real_output_vector)
+    print(previous_layer_error)
+    weights[-1] = weights[-1] - (learning_rate * np.outer(neurons_after[-2].T, previous_layer_error))
+    biases[-1] = biases[-1] - (learning_rate * previous_layer_error)
 
+    for i in range(1, len(neurons_after)-1):
+        index = i - len(neurons_after)
+        error_layer = (np.dot(previous_layer_error, weights[index+1].T) *
+                       activation_functions.relu_derivative(neurons_before[index]))
+        weights[index] = weights[index] - (learning_rate * np.outer(neurons_after[index].T, error_layer))
+        biases[index] = biases[index] - (learning_rate * error_layer)
+        previous_layer_error = error_layer
+
+    first_layer_error = (np.dot(previous_layer_error, weights[1].T) *
+                         activation_functions.relu_derivative(neurons_before[0]))
+    weights[0] = weights[0] - (learning_rate * np.outer(img_pixels.T, first_layer_error))
+    biases[0] = biases[0] - learning_rate * first_layer_error
     return weights, biases
 
 
