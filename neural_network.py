@@ -6,7 +6,8 @@ import numpy as np
 import os
 import pandas as pd
 from tqdm import tqdm
-import datetime
+from datetime import datetime
+import cv2
 
 
 def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
@@ -16,6 +17,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 	num_samples = images.shape[0]
 	for epoch in tqdm(range(epochs)):
+		total_loss = 0
 		indices = np.arange(num_samples)
 		np.random.shuffle(indices)
 
@@ -26,8 +28,6 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 			images_batch = images[batch_indices]
 			labels_batch = labels[batch_indices]
 
-			batch_loss = 0
-
 			for i in range(batch_size):
 				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
 
@@ -37,34 +37,31 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 				'''Calculate a scalar of diff between prediction and real val'''
 				cost = loss_functions.categorical_cross_entropy(model_prediction, labels_batch[i])
-				batch_loss += cost
-				print(cost)
+				total_loss += cost
 
-				old = weights.copy()
 				'''Run the network backwards to calculate gradients
 				Optimize the weights and biases with the gradients'''
 				weights, biases = optimizers.stochastic_gradient_descent(
 					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
 					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
-				print("loss: " + str(batch_loss/batch_size))
-	return
+		print("Epoch: " + str(epoch) + ", loss: " + str(total_loss/batch_size))
 	export_model(weights, biases)
 	return weights, biases
 
 
-def load_data(train_src):
+def load_data(src):
 	"""
 	Load all the supervised train data from the directory provided into two np arrays
 	:param train_src: directory path of the train data (csv files)
 	:return: a numpy array of train data, a numpy array of train labels, input layer size
 	"""
 	print("Dataset load started...")
-	all_files = os.listdir(train_src)
+	all_files = os.listdir(src)
 	csv_files = [file for file in all_files if file.endswith('.csv')]
 	images = []
 	labels = np.array([])
 	for csv_file in csv_files:
-		file_path = os.path.join(train_src, csv_file)
+		file_path = os.path.join(src, csv_file)
 		df = pd.read_csv(file_path)
 		label = np.array(df['label'])
 		labels = np.concatenate((labels, label))
@@ -100,33 +97,102 @@ def forward_propagation(neurons, weights, bias):
 	return neurons, neurons_before_active
 
 
-def export_model(weights, bias):
-	output_file_name = "model_" + str(datetime.now())
-	f = open(output_file_name, "w")
-	f.write(str(weights))
-	f.write(str(bias))
-	f.close()
+def export_model(weights, biases):
+	"""
+	export the weights and biases for future usages
+	:param weights: resulted output of the model
+	:param biases: reuslted biases of the model
+	:return: create a directory for the model and save the weights and biases in differnet files
+	"""
+	model_name = str(datetime.now())[:19]
+	new_model_name = model_name.replace(":", "_")
+	new_model_name = new_model_name.replace(" ", "_")
+	new_model_name = new_model_name.replace("-", "_")
+	model_directory = os.path.join("models", new_model_name)
+	if not os.path.exists(model_directory):
+		os.makedirs(model_directory)
+	output_weights_file_name = os.path.join(model_directory, "weights.csv")
+	output_bias_file_name = os.path.join(model_directory, "biases.csv")
+	np.savetxt(output_weights_file_name, weights, delimiter=',')
+	np.savetxt(output_bias_file_name, biases, delimiter=',')
 
 
-def evaluate(model_path, test_dir):
-	print('hi')
-# Test the data on predict many times to calculate accuracy
-# Export excel of the image, predicted, real value using pandas
-# Save all the test images with predicted and real value using matplotlib
-
-
-def predict(image_path, model_path):
-	# print(np.argmax(model_prediction_vector)) after getting output
+def evaluate():
+	"""
+	Compute the accuracy of the model by predicting all the test data and compare to the real labels
+	:return: accuracy rank as a scalar of percents (0-bad, 100-good)
+	"""
+	model_path = ui_choose_model()
 	weights, biases = import_model(model_path)
-	neurons = initial_model_values.load_neurons(image_path)
-	forward_propagation(neurons, weights, biases)
+	test_images, test_labels, input_size = load_data(src="Dataset\\test")
+	correct_predictions = 0
+	for i in range(len(test_labels)):
+		prediction = predict(test_images[i], weights, biases)
+		if prediction == test_labels[i]:
+			correct_predictions += 1
+	model_accuarcy = str(correct_predictions * 100 / len(test_labels))[:6]
+	print(f"\n{model_path} accuarcy is: {model_accuarcy}")
+	''' IMPLEMENT - export evaluation excel of every correct/incorrect image prediction and total accuracy result'''
+
+
+def predict(input_layer, weights, biases):
+	"""
+	Get a model (weight and biases) and a photo and run forward propagation to get a prediction
+	:param input_layer: 1d nparray represent the image pixels
+	:param weights: 1d nparray represent the model weights
+	:param biases: 1d nparray represent the model biases
+	:return: the predicted output of the model
+	"""
+	neurons = initial_model_values.load_neurons(
+		img=input_layer, hidden_layers=np.array([len(arr) for arr in biases[:-1]]),output_layer=len(biases[-1]))
+	neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
+	model_result = np.argmax(activation_functions.softmax(neurons[-1]))
+	print(f"The prediction for that image is: {model_result}")
+	visualize_result(img=input_layer, predicted_output=model_result)
+	return model_result
+
+
+def ui_choose_model():
+	"""
+	Ui interface for the user to choose model
+	:return: the model name that he chose from the models folder
+	"""
+	models = os.listdir("models")
+	print("\nMY MODELS:")
+	for i in range(len(models)):
+		print(f"({i}) {models[i]}")
+	model_index = str(input("\nPlease choose a model for evaluation: "))
+	print(f"Your choice: {models[int(model_index)]}")
+	model = models[int(model_index)]
+	model_path = os.path.join("models", model)
+	return model_path
 
 
 def import_model(model_path):
-	data_frame = pd.read_csv(model_path)
-	return data_frame.loc[0], data_frame.loc[1]
+	"""
+	Load the weights and biases of a model by its path
+	:param model_path: the path of the model
+	:return: the weights and biases of the model
+	"""
+	weights_path = os.path.join(model_path, "weights.csv")
+	biases_path = os.path.join(model_path, "biases.csv")
+	weights = pd.read_csv(weights_path, header=None)
+	biases = pd.read_csv(biases_path, header=None)
+	weights = weights.values
+	biases = biases.values
+	return weights, biases
 
 
-def visualize_result(img, neurons, weights, predicted_output, real_output):
-	print("draw")
-	return "drawing"
+''' IMPLEMENT '''
+
+
+def visualize_result(img, predicted_output):
+	return "draw an image with its label"
+
+
+def draw_network(img, neurons, weights, predicted_output, real_output):
+	"""
+	a function that draw the activation neurons of a network
+	:return:
+	"""
+	return 1
