@@ -1,5 +1,6 @@
 import neural_network
 import numpy as np
+import cv2
 
 
 def main():
@@ -11,10 +12,16 @@ def main():
 			output_layer=10, epochs=20, batch_size=100)
 	elif user_choice == "2":
 		print("you choice: evaluating a model\n")
-		neural_network.evaluate(test_dir="Dataset\\test")
+		neural_network.evaluate()
 	elif user_choice == "3":
 		print("you choice: predicting an output\n")
-		neural_network.predict(image_path="Dataset\\test")
+		image = cv2.imread("image_path")
+		input_layer = 0
+		if image is not None:
+			input_layer = image.flatten()
+		model_path = neural_network.ui_choose_model()
+		weights, biases = neural_network.import_model(model_path)
+		neural_network.predict(input_layer, weights, biases)
 	else:
 		print("Answer must be 1, 2 or 3")
 

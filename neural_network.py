@@ -49,19 +49,19 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 	return weights, biases
 
 
-def load_data(train_src):
+def load_data(src):
 	"""
 	Load all the supervised train data from the directory provided into two np arrays
 	:param train_src: directory path of the train data (csv files)
 	:return: a numpy array of train data, a numpy array of train labels, input layer size
 	"""
 	print("Dataset load started...")
-	all_files = os.listdir(train_src)
+	all_files = os.listdir(src)
 	csv_files = [file for file in all_files if file.endswith('.csv')]
 	images = []
 	labels = np.array([])
 	for csv_file in csv_files:
-		file_path = os.path.join(train_src, csv_file)
+		file_path = os.path.join(src, csv_file)
 		df = pd.read_csv(file_path)
 		label = np.array(df['label'])
 		labels = np.concatenate((labels, label))
@@ -117,36 +117,38 @@ def export_model(weights, biases):
 	np.savetxt(output_bias_file_name, biases, delimiter=',')
 
 
-def evaluate(test_dir):
-	'''Test the data on predict many times to calculate accuracy
-	Export excel of the image, predicted, real value using pandas
-	Save all the test images with predicted and real value using matplotlib'''
+def evaluate():
+	"""
+	Compute the accuracy of the model by predicting all the test data and compare to the real labels
+	:return: accuracy rank as a scalar of percents (0-bad, 100-good)
+	"""
 	model_path = ui_choose_model()
 	weights, biases = import_model(model_path)
-	# load the test data
-	# predict all the images
-	# sum the process' accuarcy
+	test_images, test_labels, input_size = load_data(src="Dataset\\test")
+	correct_predictions = 0
+	for i in range(len(test_labels)):
+		prediction = predict(test_images[i], weights, biases)
+		if prediction == test_labels[i]:
+			correct_predictions += 1
+	model_accuarcy = str(correct_predictions * 100 / len(test_labels))[:6]
+	print(f"\n{model_path} accuarcy is: {model_accuarcy}")
+	''' IMPLEMENT - export evaluation excel of every correct/incorrect image prediction and total accuracy result'''
 
 
-def predict(image_path):
+def predict(input_layer, weights, biases):
 	"""
 	Get a model (weight and biases) and a photo and run forward propagation to get a prediction
-	:param image_path: path to the image for prediction
-	:param model_path: path to the model that you want the user want to use for prediction
+	:param input_layer: 1d nparray represent the image pixels
+	:param weights: 1d nparray represent the model weights
+	:param biases: 1d nparray represent the model biases
 	:return: the predicted output of the model
 	"""
-	model_path = ui_choose_model()
-	weights, biases = import_model(model_path)
-	image = cv2.imread(image_path)
-	input_layer = 0
-	if image is not None:
-		input_layer = image.flatten()
 	neurons = initial_model_values.load_neurons(
 		img=input_layer, hidden_layers=np.array([len(arr) for arr in biases[:-1]]),output_layer=len(biases[-1]))
 	neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
 	model_result = np.argmax(activation_functions.softmax(neurons[-1]))
 	print(f"The prediction for that image is: {model_result}")
-	visualize_result(img=image, predicted_output=model_result)
+	visualize_result(img=input_layer, predicted_output=model_result)
 	return model_result
 
 
