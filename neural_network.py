@@ -121,25 +121,22 @@ def evaluate(test_dir):
 	'''Test the data on predict many times to calculate accuracy
 	Export excel of the image, predicted, real value using pandas
 	Save all the test images with predicted and real value using matplotlib'''
-	models = os.listdir("models")
-	print("\nMY MODELS:")
-	for i in range(len(models)):
-		print(f"({i}) {models[i]}")
-	model_index = str(input("\nPlease choose a model for evaluation: "))
-	print(f"Your choice: {models[int(model_index)]}")
+	model = ui_choose_model()
 	# Import the model
 	# load the test data
 	# predict all the images
 	# sum the process' accuarcy
 
 
-def predict(image_path, model_path):
+def predict(image_path):
 	"""
 	Get a model (weight and biases) and a photo and run forward propagation to get a prediction
 	:param image_path: path to the image for prediction
 	:param model_path: path to the model that you want the user want to use for prediction
 	:return: the predicted output of the model
 	"""
+	model = ui_choose_model()
+	model_path = os.path.join("models", model)
 	weights, biases = import_model(model_path)
 	image = cv2.imread(image_path)
 	input_layer = 0
@@ -152,6 +149,21 @@ def predict(image_path, model_path):
 	print(f"The prediction for that image is: {model_result}")
 	visualize_result(img=image, predicted_output=model_result)
 	return model_result
+
+
+def ui_choose_model():
+	"""
+	Ui interface for the user to choose model
+	:return: the model name that he chose from the models folder
+	"""
+	models = os.listdir("models")
+	print("\nMY MODELS:")
+	for i in range(len(models)):
+		print(f"({i}) {models[i]}")
+	model_index = str(input("\nPlease choose a model for evaluation: "))
+	print(f"Your choice: {models[int(model_index)]}")
+	return models[int(model_index)]
+
 
 def import_model(model_path):
 	data_frame = pd.read_csv(model_path)

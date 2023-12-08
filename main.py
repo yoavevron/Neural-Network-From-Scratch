@@ -14,7 +14,7 @@ def main():
 		neural_network.evaluate(test_dir="Dataset\\test")
 	elif user_choice == "3":
 		print("you choice: predicting an output\n")
-		neural_network.predict(image_path="Dataset\\test", model_path="")
+		neural_network.predict(image_path="Dataset\\test")
 	else:
 		print("Answer must be 1, 2 or 3")
 
