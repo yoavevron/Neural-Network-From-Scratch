@@ -16,6 +16,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 	num_samples = images.shape[0]
 	for epoch in tqdm(range(epochs)):
+		total_loss = 0
 		indices = np.arange(num_samples)
 		np.random.shuffle(indices)
 
@@ -26,8 +27,6 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 			images_batch = images[batch_indices]
 			labels_batch = labels[batch_indices]
 
-			batch_loss = 0
-
 			for i in range(batch_size):
 				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
 
@@ -37,17 +36,14 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 				'''Calculate a scalar of diff between prediction and real val'''
 				cost = loss_functions.categorical_cross_entropy(model_prediction, labels_batch[i])
-				batch_loss += cost
-				print(cost)
+				total_loss += cost
 
-				old = weights.copy()
 				'''Run the network backwards to calculate gradients
 				Optimize the weights and biases with the gradients'''
 				weights, biases = optimizers.stochastic_gradient_descent(
 					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
 					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
-				print("loss: " + str(batch_loss/batch_size))
-	return
+		print("Epoch: " + str(epoch) + ", loss: " + str(total_loss/batch_size))
 	export_model(weights, biases)
 	return weights, biases
 
@@ -120,19 +116,27 @@ def export_model(weights, biases):
 	np.savetxt(output_bias_file_name, biases, delimiter=',')
 
 
-def evaluate(model_path, test_dir):
-	print('hi')
-# Test the data on predict many times to calculate accuracy
-# Export excel of the image, predicted, real value using pandas
-# Save all the test images with predicted and real value using matplotlib
+def evaluate(test_dir):
+	'''Test the data on predict many times to calculate accuracy
+	Export excel of the image, predicted, real value using pandas
+	Save all the test images with predicted and real value using matplotlib'''
+	models = os.listdir("models")
+	print("\nMY MODELS:")
+	for i in range(len(models)):
+		print(f"({i}) {models[i]}")
+	model_index = str(input("\nPlease choose a model for evaluation: "))
+	print(f"Your choice: {models[int(model_index)]}")
+	# Import the model
+	# load the test data
+	# predict all the images
+	# sum the process' accuarcy
 
 
 def predict(image_path, model_path):
-	# print(np.argmax(model_prediction_vector)) after getting output
 	weights, biases = import_model(model_path)
 	neurons = initial_model_values.load_neurons(image_path)
-	forward_propagation(neurons, weights, biases)
-
+	neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
+	return np.argmax(neurons[-1])
 
 def import_model(model_path):
 	data_frame = pd.read_csv(model_path)
