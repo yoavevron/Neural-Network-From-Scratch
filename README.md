@@ -6,19 +6,21 @@
 
 ## How to use
 * Run main.py
-#### Adjusting network parameters 
-Inside the neural_network.train_model in main.py change
+### Adjusting network parameters 
+Inside the **neural_network.train_model** function in **main.py** change
 * The parameters that are given to neural_network.train_model
 * The image to predict
 * Note: when choosing evaluating you'll be asked to choose a model to evaluate
-Inside the train_model function in neural_network.py chnage:
+
+<br />Inside the **train_model** function in **neural_network.py** chnage:
 * Initalized weights and biases values method (random/xavier/he)
 * loss function (by default: Categorical Cross Entropy)
 * optimizers (by default: Stochastic Gradient Descent)
-Inside forward_propagation function in neural_network.py chnage:
+
+<br />Inside **forward_propagation** function in **neural_network.py** chnage:
 * Activation function of the hidden layers (by default: ReLu)
-#### Changing Train/Test data
+### Changing Train/Test data
 Data format:
 * Both train and test data should be saved in csvs in the proper folder as saved in the project
-* File format inside csv: rows = images, columns=flatten vector of the images' pixels. (for example a csv of 1000 images in size of 28X28 image will be organized that every row will represent another image, every column represent another pixel of the image (so 1000 rows x 784 columns). In addition, the first column represent the image real value. So in total the table will be (1000 X 785) 
+* File format inside csv: (rows = images, columns=flatten vector of the images' pixels). For example, a csv of 1000 images in size of 28X28 image will be organized that every row will represent another image, every column represent another pixel of the image (so 1000 rows x 784 columns). In addition, the first column represent the image real value. So in total the table will be (1000 X 785) 
 * If files format change it's crucial to update the load_data function inside neural_network.py to read the data properly
