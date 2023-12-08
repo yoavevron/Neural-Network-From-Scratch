@@ -15,13 +15,14 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
 
 	num_samples = images.shape[0]
-	for epoch in tqdm(range(epochs)):
+	for epoch in range(epochs):
 		total_loss = 0
 		indices = np.arange(num_samples)
 		np.random.shuffle(indices)
-		for start in range(0, num_samples, batch_size):
-			# print(f"batch: {(start+1)/batch_size}")
+		for start in tqdm(range(0, num_samples-batch_size, batch_size), leave=True):
+			# print(f'batch: {start/batch_size}', end="\n")
 			end = start + batch_size
+			# print(start, end, num_samples)
 			batch_indices = indices[start:end]
 
 			images_batch = images[batch_indices]
@@ -29,6 +30,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 			for i in range(batch_size):
 				# print(f"image: {batch_indices[i]}")
+				# print(images_batch[i].shape)
 				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
 
 				'''Run the network to get predicted value'''
@@ -44,7 +46,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 				weights, biases = optimizers.stochastic_gradient_descent(
 					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
 					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
-		print(f"Epoch: {str(epoch)} loss: {str(total_loss/batch_size)}")
+		print(f"\tEpoch: {str(epoch+1)}/{epochs} finished. Loss: {str(total_loss/batch_size)}")
 	export_model(weights, biases)
 	return weights, biases
 

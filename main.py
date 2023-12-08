@@ -8,7 +8,7 @@ import image_handling
 def main():
 	user_choice = input("(1) Train model\n(2) Evaluate model\n(3) Predict value\n\nWhat you wanna do? User: ")
 	if user_choice == "1":
-		print("you choice: training a model\n")
+		print("you choice: training a model")
 		neural_network.train_model(
 			train_dir="Dataset\\train", hidden_layers=(16, 16),
 			output_layer=10, epochs=20, batch_size=100)
