@@ -7,17 +7,17 @@
 ## How to use
 * Run main.py
 ### Adjusting network parameters 
-Inside the **neural_network.train_model** function in **main.py** change
+Inside the **neural_network.train_model** function in **main.py** adjust:
 * The parameters that are given to neural_network.train_model
 * The image to predict
 * Note: when choosing evaluating you'll be asked to choose a model to evaluate
 
-<br />Inside the **train_model** function in **neural_network.py** chnage:
+<br />Inside the **train_model** function in **neural_network.py** adjust:
 * Initalized weights and biases values method (random/xavier/he)
 * loss function (by default: Categorical Cross Entropy)
 * optimizers (by default: Stochastic Gradient Descent)
 
-<br />Inside **forward_propagation** function in **neural_network.py** chnage:
+<br />Inside **forward_propagation** function in **neural_network.py** adjust:
 * Activation function of the hidden layers (by default: ReLu)
 ### Changing Train/Test data
 Data format:
