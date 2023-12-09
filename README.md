@@ -1,12 +1,19 @@
 # Basic Artificial Neural Network
 
 This project established in order to reach a comprehensive understanding of the artificial neural network learning mechanism. An essential component to achieve this goal is to delve into the pure mathematical formulas implementation of a plain-vanilla basic neural network algorithm. This repository aims to serve as a valuable resource for those seeking to enhance their understanding by hands-on exploration of the foundations of that concept.
-- Have tried to implement the simplest fully connected Multi Layer Perceptron
+- Attempted to implement the simplest fully connected Multi Layer Perceptron
 - Only usage of mathematics and numpy (without tensorflow/pytorch)
 - Intended for hand-written digits image classification (MNIST Data Set)
 
 ## Quick Start
-* Run main.py
+Clone repository:
+```
+git clone https://github.com/yoavevron/Basic-Artificial-Neural-Network.git
+```
+Run:
+```
+python main.py
+```
 ### Adjusting network parameters (optional)
 Inside the **main.py** adjust:
 * The parameters that are given to neural_network.train_model
@@ -15,11 +22,11 @@ Inside the **main.py** adjust:
 
 <br />Inside the **train_model** function in **neural_network.py** adjust:
 * Initalized weights and biases values method (random/xavier/he)
-* loss function (by default: Categorical Cross Entropy)
-* optimizers (by default: Stochastic Gradient Descent)
+* loss function (default: Categorical Cross Entropy)
+* optimizers (default: Stochastic Gradient Descent)
 
 <br />Inside **forward_propagation** function in **neural_network.py** adjust:
-* Activation function of the hidden layers (by default: ReLu)
+* Activation function of the hidden layers (default: ReLu)
 ### Changing train/test data (optional)
 Data format:
 * Both train and test data should be saved in CSVs in the proper folder as saved in the project
