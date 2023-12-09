@@ -6,6 +6,8 @@ def stochastic_gradient_descent(img_pixels, neurons_before, neurons_after, weigh
     real_output_vector = np.zeros(len(biases[-1]))
     real_output_vector[int(real)] = 1
 
+    neurons_after[-1] = activation_functions.softmax(neurons_after[-1])
+
     previous_layer_error = (activation_functions.softmax_derivative
                             (neurons_before[-1]) *
                             neurons_after[-1] - real_output_vector)

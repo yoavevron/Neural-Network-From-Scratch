@@ -1,3 +1,4 @@
+import image_handling
 import initial_model_values
 import activation_functions
 import loss_functions
@@ -16,26 +17,25 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 	num_samples = images.shape[0]
 	for epoch in range(epochs):
+		counter = 0
 		total_loss = 0
 		indices = np.arange(num_samples)
 		np.random.shuffle(indices)
 		for start in tqdm(range(0, num_samples-batch_size, batch_size), leave=True):
-			# print(f'batch: {start/batch_size}', end="\n")
 			end = start + batch_size
-			# print(start, end, num_samples)
 			batch_indices = indices[start:end]
 
 			images_batch = images[batch_indices]
 			labels_batch = labels[batch_indices]
 
 			for i in range(batch_size):
-				# print(f"image: {batch_indices[i]}")
-				# print(images_batch[i].shape)
+				counter += 1
 				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
 
 				'''Run the network to get predicted value'''
 				neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
 				model_prediction = neurons[-1]
+				# print(f"{counter}) output_layer: {model_prediction}")
 
 				'''Calculate a scalar of diff between prediction and real val'''
 				cost = loss_functions.categorical_cross_entropy(model_prediction, labels_batch[i])
@@ -46,6 +46,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 				weights, biases = optimizers.stochastic_gradient_descent(
 					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
 					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
+				# return
 		print(f"\tEpoch: {str(epoch+1)}/{epochs} finished. Loss: {str(total_loss/batch_size)}")
 	export_model(weights, biases)
 	return weights, biases
@@ -89,11 +90,13 @@ def forward_propagation(neurons, weights, bias):
 	:return: a softmax probabilities vector of the output to the inserted input image
 	"""
 	neurons_before_active = []
+	# neurons_before_active.append(neurons[0])
 	for i in range(1, len(neurons)-1):
 		neurons[i] = neurons[i-1].dot(weights[i-1])
 		neurons[i] = neurons[i] + bias[i-1]
 		neurons_before_active.append(neurons[i])
 		neurons[i] = activation_functions.relu(neurons[i])
+	# Calculate the last layer separately to avoid activate it with relu
 	neurons[-1] = neurons[-2].dot(weights[-1])
 	neurons[-1] = neurons[-1] + bias[-1]
 	neurons_before_active.append(neurons[-1])
