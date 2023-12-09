@@ -10,7 +10,7 @@ from tqdm.auto import tqdm
 from datetime import datetime
 
 
-def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
+def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size, learning_rate):
 	images, labels, input_size = load_data(train_dir)  # Read train data from csv to arrays
 	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
@@ -39,15 +39,15 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
 
 				'''Calculate a scalar of diff between prediction and real val'''
 				cost = loss_functions.categorical_cross_entropy(model_prediction, labels_batch[i])
+				print(cost)
 				total_loss += cost
 
 				'''Run the network backwards to calculate gradients
 				Optimize the weights and biases with the gradients'''
 				weights, biases = optimizers.stochastic_gradient_descent(
 					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
-					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
-				# return
-		print(f"\tEpoch: {str(epoch+1)}/{epochs} finished. Loss: {str(total_loss/batch_size)}")
+					weights=weights, biases=biases, real=labels_batch[i], learning_rate=learning_rate)
+		print(f"\tEpoch: {str(epoch+1)}/{epochs} finished. Loss: {str(total_loss/num_samples)}")
 	export_model(weights, biases)
 	return weights, biases
 
