@@ -1,10 +1,11 @@
 # Basic Artificial Neural Network
 
+This project established in order to reach a comprehensive understanding of the artificial neural network learning mechanism. An essential component to achieve this goal is to delve into the pure mathematical formulas implementation of a plain-vanilla basic neural network algorithm. This repository aims to serve as a valuable resource for those seeking to enhance their understanding by hands-on exploration of the foundations of that concept.
 - Have tried to implement the simplest fully connected Multi Layer Perceptron
 - Only usage of mathematics and numpy (without tensorflow/pytorch)
 - Intended for hand-written digits image classification (MNIST Data Set)
 
-## How to use
+## Quick Start
 * Run main.py
 ### Adjusting network parameters (optional)
 Inside the **main.py** adjust:
