@@ -9,11 +9,11 @@ Note: The training function runs the forward and backward propagation for every 
 
 
 ## Quick Start
-Clone repository:
+Clone repository in Git Bash:
 ```
 git clone https://github.com/yoavevron/Basic-Artificial-Neural-Network.git
 ```
-Run:
+Run in Command Line:
 ```
 python main.py
 ```
@@ -30,7 +30,7 @@ Inside the **main.py** adjust:
 
 <br />Inside **forward_propagation** function in **neural_network.py** adjust:
 * Activation function of the hidden layers (default: ReLu)
-### Changing train/test data (optional)
+### Use your own dataset (optional)
 Data format:
 * Both train and test data should be saved in CSVs in the proper folder as saved in the project
 * File format inside CSV: (rows = images, columns=flatten vector of the images' pixels). For example, a CSV of 1000 images in size of 28X28 image will be organized that every row will represent another image, every column represent another pixel of the image (so 1000 rows x 784 columns). In addition, the first column represent the image real value. So in total the table will be (1000 X 785) 
