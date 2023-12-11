@@ -10,14 +10,17 @@ def categorical_cross_entropy(model_prediction_vector, real_output):
     :param real_output: real output as a scalar
     :return: the loss between the input vector and the real output after converted to vector
     """
-    real_output_vector = np.zeros(len(model_prediction_vector))
+    return 1
+    real_output_vector = np.zeros(model_prediction_vector.shape)
+    for i in range(len(real_output_vector)):
+        real_output_vector[i][real_output[i]] = 1
     real_output_vector[int(real_output)] = 1
 
     model_prediction_vector = activation_functions.softmax(model_prediction_vector)
 
     epsilon = 1e-15
     x = np.clip(model_prediction_vector, epsilon, 1 - epsilon)
-    loss = -np.sum(real_output_vector * np.log(x)) / real_output_vector.shape[0]
+    loss = -np.sum(real_output_vector * np.log(x))
     return loss
 
 

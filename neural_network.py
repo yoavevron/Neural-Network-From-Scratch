@@ -27,6 +27,7 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size, lear
 	for epoch in tqdm(range(epochs), leave=True):
 		total_loss = 0
 		correct_predictions = 0
+		cost = 0
 		for start in range(0, num_samples, batch_size):
 			end = start + batch_size
 			batch_images = images[start:end]
@@ -37,26 +38,23 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size, lear
 			z, n = forward_propagation(n, w, b)
 
 			# Calculate loss
-			'''model_prediction = neurons[-1]
-			cost = loss_functions.categorical_cross_entropy(model_prediction, labels[i])
-			average_loss = cost / batch_size'''
+			model_prediction = n[-1]
+			cost += loss_functions.categorical_cross_entropy(model_prediction, batch_labels)
 
 			# Calculate accuracy
 			batch_predicted = np.argmax(activation_functions.softmax(n[-1]), axis=1)
 			batch_labels_as_integers = batch_labels.astype(int)
 			correct_predictions += (np.sum(batch_predicted == batch_labels_as_integers))
-			average_accuracy = correct_predictions * 100 / batch_size
 
+			# Backward propagation
 			w, b = optimizers.gradient_descent(a=n, z=z, w=w, b=b, x=z[0], label=batch_labels_as_integers,
-											   m=num_samples/batch_size, learn_rate=0.1)
-
-
-			print(f"Epoch {epoch}/{epochs}, Batch {int((start+1)/batch_size)}/{int(num_samples/batch_size)}"
-					  f". Loss: {average_loss}, Accuracy: {average_accuracy}%")
-
-			total_loss = 0
-
-			correct_predictions = 0
+											   m=num_samples/batch_size, learn_rate=learning_rate)
+			print(w[-1][-1])
+		average_loss = cost / num_samples
+		average_accuracy = correct_predictions * 100 / num_samples
+		print(f"Epoch {epoch}/{epochs}. Loss: {average_loss}, Accuracy: {average_accuracy}%")
+		total_loss = 0
+		correct_predictions = 0
 	export_model(w, b)
 	return w, b
 
