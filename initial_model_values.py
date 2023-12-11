@@ -36,9 +36,11 @@ def random_bias_init(hidden_layers, output_size):
     """
     biases = []
     for i in range(len(hidden_layers)):
-        layer = random.randn(hidden_layers[i])
+        # layer = random.randn(hidden_layers[i])
+        layer = np.zeros(hidden_layers[i])
         biases.append(layer)
-    layer = random.randn(output_size)
+    # layer = random.randn(output_size)
+    layer = np.zeros(output_size)
     biases.append(layer)
     return biases
 

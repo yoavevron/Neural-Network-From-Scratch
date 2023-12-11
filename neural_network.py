@@ -1,3 +1,4 @@
+import image_handling
 import initial_model_values
 import activation_functions
 import loss_functions
@@ -9,44 +10,50 @@ from tqdm.auto import tqdm
 from datetime import datetime
 
 
-def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size):
-	images, labels, input_size = load_data(train_dir)  # Read train data from csv to arrays
+def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size, learning_rate):
+
+	# Load the data then shuffle it
+	src_images, src_labels, input_size = load_data(train_dir)  # Read train data from csv to arrays
+	permutation = np.random.permutation(len(src_labels))
+	images = src_images[permutation]
+	labels = src_labels[permutation]
+
+	# Initialize random and biases weights
 	weights = initial_model_values.random_weights_init(input_size, hidden_layers, output_layer)
 	biases = initial_model_values.random_bias_init(hidden_layers, output_layer)
 
 	num_samples = images.shape[0]
+
 	for epoch in range(epochs):
 		total_loss = 0
-		indices = np.arange(num_samples)
-		np.random.shuffle(indices)
-		for start in tqdm(range(0, num_samples-batch_size, batch_size), leave=True):
-			# print(f'batch: {start/batch_size}', end="\n")
-			end = start + batch_size
-			# print(start, end, num_samples)
-			batch_indices = indices[start:end]
+		correct_predictions = 0
+		for i in tqdm(range(num_samples), leave=True):
+			neurons = initial_model_values.load_neurons(images[i], hidden_layers, output_layer)
 
-			images_batch = images[batch_indices]
-			labels_batch = labels[batch_indices]
+			# Run the network to get predicted value
+			neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
+			model_prediction = neurons[-1]
 
-			for i in range(batch_size):
-				# print(f"image: {batch_indices[i]}")
-				# print(images_batch[i].shape)
-				neurons = initial_model_values.load_neurons(images_batch[i], hidden_layers, output_layer)
+			if np.argmax(activation_functions.softmax(neurons[-1])) == labels[i]:
+				correct_predictions += 1
 
-				'''Run the network to get predicted value'''
-				neurons, neurons_before_active = forward_propagation(neurons, weights, biases)
-				model_prediction = neurons[-1]
+			# Calculate a scalar of diff between prediction and real val
+			cost = loss_functions.categorical_cross_entropy(model_prediction, labels[i])
+			total_loss += cost
 
-				'''Calculate a scalar of diff between prediction and real val'''
-				cost = loss_functions.categorical_cross_entropy(model_prediction, labels_batch[i])
-				total_loss += cost
+			# Compute weights and biases gradients
+			weights, biases = optimizers.stochastic_gradient_descent(
+				img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
+				weights=weights, biases=biases, real=labels[i], learning_rate=learning_rate)
 
-				'''Run the network backwards to calculate gradients
-				Optimize the weights and biases with the gradients'''
-				weights, biases = optimizers.stochastic_gradient_descent(
-					img_pixels=neurons[0], neurons_before=neurons_before_active, neurons_after=neurons[1:],
-					weights=weights, biases=biases, real=labels_batch[i], learning_rate=0.001)
-		print(f"\tEpoch: {str(epoch+1)}/{epochs} finished. Loss: {str(total_loss/batch_size)}")
+			if (i % batch_size == 0):
+				average_loss = total_loss / batch_size
+				average_accuracy = correct_predictions * 100 / batch_size
+				total_loss = 0
+				correct_predictions = 0
+				# optimizers.update_params(gradients)
+				print(f"Epoch {epoch}/{epochs}, Batch {int(i/batch_size)}/{int(num_samples/batch_size)}"
+					  f". Loss: {average_loss}, Accuracy: {average_accuracy}%")
 	export_model(weights, biases)
 	return weights, biases
 
@@ -89,11 +96,13 @@ def forward_propagation(neurons, weights, bias):
 	:return: a softmax probabilities vector of the output to the inserted input image
 	"""
 	neurons_before_active = []
+	# neurons_before_active.append(neurons[0])
 	for i in range(1, len(neurons)-1):
 		neurons[i] = neurons[i-1].dot(weights[i-1])
 		neurons[i] = neurons[i] + bias[i-1]
 		neurons_before_active.append(neurons[i])
 		neurons[i] = activation_functions.relu(neurons[i])
+	# Calculate the last layer separately to avoid activate it with relu
 	neurons[-1] = neurons[-2].dot(weights[-1])
 	neurons[-1] = neurons[-1] + bias[-1]
 	neurons_before_active.append(neurons[-1])
