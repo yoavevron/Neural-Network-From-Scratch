@@ -1,5 +1,41 @@
 import activation_functions
 import numpy as np
+import activation_functions
+
+
+def gradient_descent(a, z, w, b, x, label, m, learn_rate):
+    # How is it that all biases same, is it okay?
+    dw_final = []
+    db_final = []
+    y = np.zeros(a[-1].shape)
+    for i in range(len(y)):
+        y[i][label[i]] = 1
+    # verify functions and matrix doting
+    old_dz = a[-1] - y
+    dw = 1 / m * old_dz.T.dot(a[-2])
+    db = np.full(a[-1].shape[1], 1 / m * np.sum(old_dz))
+    dw_final.insert(0, dw.T)
+    db_final.insert(0, db.T)
+
+    for i in range(len(w)-2):
+        index = -2-i
+        new_dz = w[index+1].dot(old_dz.T) * activation_functions.relu_derivative(z[index].T)
+        dw = 1 / m * new_dz.dot(a[index])
+        db = np.full(a[i+1].shape[1], 1 / m * np.sum(new_dz))
+        dw_final.insert(0, dw.T)
+        db_final.insert(0, db.T)
+        old_dz = new_dz
+    new_dz = w[1].dot(old_dz) * activation_functions.relu_derivative(z[1].T)
+    dw = 1 / m * new_dz.dot(x)
+    db = np.full(a[1].shape[1], 1 / m * np.sum(new_dz))
+    dw_final.insert(0, dw.T)
+    db_final.insert(0, db.T)
+
+    for i in range(len(db_final)):
+        w[i] = w[i] - learn_rate * dw_final[i]
+        b[i] = b[i] - learn_rate * db_final[i]
+
+    return w, b
 
 
 def stochastic_gradient_descent(img_pixels, neurons_before, neurons_after, weights, biases, real, learning_rate):
@@ -31,39 +67,3 @@ def stochastic_gradient_descent(img_pixels, neurons_before, neurons_after, weigh
 
 def adam():
     return 1
-
-
-def backward_pass(X, y_true, hidden_inputs, hidden_outputs, weights, biases, learning_rate):
-    real_output_vector = np.zeros(len(biases[-1]))
-    real_output_vector[int(y_true)] = 1
-    y_true = real_output_vector
-
-    num_layers = len(hidden_inputs)
-
-    # Compute the derivative of the loss with respect to the predicted output
-    loss_derivative = np.dot(activation_functions.softmax_derivative(hidden_outputs[-1]), weights[-1]) * (hidden_outputs[-1] - y_true)
-    print("g")
-    print(learning_rate * np.dot(hidden_outputs[-2].T, loss_derivative))
-    # Backpropagation for the output layer
-    weights[-1] -= learning_rate * np.dot(hidden_outputs[-2].T, loss_derivative)
-    biases[-1] -= learning_rate * np.sum(loss_derivative, axis=0)
-    print()
-
-    for i in range(num_layers - 1, 0, -1):
-        # Backpropagation for hidden layers
-        hidden_delta = (np.dot(loss_derivative, weights[i].T) *
-                        activation_functions.relu_derivative(hidden_inputs[i - 1]))
-        weights[i - 1] -= learning_rate * np.dot(hidden_outputs[i - 2].T, hidden_delta)
-        biases[i - 1] -= learning_rate * np.sum(hidden_delta, axis=0)
-
-        loss_derivative = hidden_delta
-
-    # Backpropagation for the first hidden layer
-    hidden_delta = np.dot(loss_derivative.T, weights[0].T) * activation_functions.relu_derivative(X)
-    print(hidden_delta.shape)
-    print(X.shape)
-    print(hidden_delta.T.shape)
-    weights[0] -= learning_rate * np.dot(X.reshape(1, len(X)), hidden_delta.T)
-    biases[0] -= learning_rate * np.sum(hidden_delta, axis=0)
-
-    return weights, biases
