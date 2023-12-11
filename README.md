@@ -4,9 +4,6 @@ This project established in order to reach a comprehensive understanding of the 
 - Attempted to implement the simplest fully connected Multi Layer Perceptron
 - Only usage of mathematics and numpy (without tensorflow/pytorch)
 - Intended for hand-written digits image classification (MNIST Data Set)
-<br/>
-Note: The training function runs the forward and backward propagation for every image separately instead of as a group, what makes the training process to be significantly slower but hopefully provide better understanding of the mathematical process that happen  for **every single image**
-
 
 ## Quick Start
 Clone repository in Git Bash:
