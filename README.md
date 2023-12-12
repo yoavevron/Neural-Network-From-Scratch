@@ -1,6 +1,6 @@
 # Neural Network From Scratch
 
-This project established in order to reach a comprehensive understanding of the artificial neural network learning mechanism. An essential component to achieve this goal is to delve into the pure mathematical formulas implementation of a plain-vanilla basic neural network algorithm. This repository aims to serve as a valuable resource for those seeking to enhance their understanding by hands-on exploration of the foundations of that concept.
+This project established in order to reach a comprehensive understanding of the artificial neural network learning mechanism. An essential component to achieve this goal is to delve into the pure mathematical equations of a plain-vanilla basic neural network algorithm. This repository aims to serve as a valuable resource for those seeking to enhance their understanding by hands-on exploration of the foundations of that concept.
 - Attempted to implement the simplest fully connected Multi Layer Perceptron
 - Only usage of mathematics and numpy (without tensorflow/pytorch)
 - Intended for image categorical classification
