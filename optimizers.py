@@ -20,8 +20,9 @@ def gradient_descent(a, z, w, b, x, label, m, learn_rate):
     for i in range(len(w)-2):
         index = -2-i
         new_dz = w[index+1].dot(old_dz.T) * activation_functions.relu_derivative(z[index].T)
-        dw = 1 / m * new_dz.dot(a[index])
-        db = np.full(a[i+1].shape[1], 1 / m * np.sum(new_dz))
+        print(new_dz[-1])
+        dw = 1 / m * new_dz.dot(a[index-1])
+        db = np.full(a[index].shape[1], 1 / m * np.sum(new_dz))
         dw_final.insert(0, dw.T)
         db_final.insert(0, db.T)
         old_dz = new_dz
