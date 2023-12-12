@@ -4,9 +4,6 @@ This project established in order to reach a comprehensive understanding of the 
 - Attempted to implement the simplest fully connected Multi Layer Perceptron
 - Only usage of mathematics and numpy (without tensorflow/pytorch)
 - Intended for hand-written digits image classification (MNIST Data Set)
-<br/>
-Note: The training function runs the forward and backward propagation for every image separately instead of as a group, what makes the training process to be significantly slower but hopefully provide better understanding of the mathematical process that happen  for **every single image**
-
 
 ## Quick Start
 Clone repository in Git Bash:
@@ -30,7 +27,7 @@ Inside the **main.py** adjust:
 
 <br />Inside **forward_propagation** function in **neural_network.py** adjust:
 * Activation function of the hidden layers (default: ReLu)
-### Use your own dataset (optional)
+### Train your own model
 Data format:
 * Both train and test data should be saved in CSVs in the proper folder as saved in the project
 * File format inside CSV: (rows = images, columns=flatten vector of the images' pixels). For example, a CSV of 1000 images in size of 28X28 image will be organized that every row will represent another image, every column represent another pixel of the image (so 1000 rows x 784 columns). In addition, the first column represent the image real value. So in total the table will be (1000 X 785) 
