@@ -7,8 +7,8 @@ def main():
 	if user_choice == "1":
 		print("you choice: training a model")
 		neural_network.train_model(
-			train_dir="Dataset\\train", hidden_layers=(16, 16),
-			output_layer=10, epochs=500, batch_size=64, learning_rate=0.1)
+			train_dir="Dataset\\train", hidden_layers=(32,16),
+			output_layer=10, epochs=500, batch_size=64, learning_rate=0.01)
 	elif user_choice == "2":
 		print("you choice: evaluating a model\n")
 		neural_network.evaluate()

@@ -49,7 +49,6 @@ def train_model(train_dir, hidden_layers, output_layer, epochs, batch_size, lear
 			# Backward propagation
 			w, b = optimizers.gradient_descent(a=n, z=z, w=w, b=b, x=z[0], label=batch_labels_as_integers,
 											   m=num_samples/batch_size, learn_rate=learning_rate)
-			print(w[-1][-1])
 		average_loss = cost / num_samples
 		average_accuracy = correct_predictions * 100 / num_samples
 		print(f"Epoch {epoch}/{epochs}. Loss: {average_loss}, Accuracy: {average_accuracy}%")
